@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clutch & Gearbox — Interactive Lesson</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0d0d;
+  --surface: #181818;
+  --surface2: #222;
+  --accent: #ff5722;
+  --accent2: #ff9100;
+  --accent3: #ffd600;
+  --text: #f0ece4;
+  --text-dim: #8a8680;
+  --success: #00e676;
+  --fail: #ff1744;
+  --radius: 16px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 40%, rgba(255,87,34,.15), transparent),
+    radial-gradient(ellipse 80% 40% at 20% 80%, rgba(255,145,0,.08), transparent),
+    radial-gradient(ellipse 60% 40% at 80% 20%, rgba(255,214,0,.06), transparent);
+  pointer-events: none;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  background: var(--surface);
+  border: 1px solid rgba(255,87,34,.3);
+  padding: .45rem 1rem;
+  border-radius: 100px;
+  font-size: .8rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--accent);
+  margin-bottom: 1.5rem;
+  animation: fadeDown .8s ease;
+}
+
+.hero-badge span { font-size: 1rem; }
+
+h1 {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: clamp(2.8rem, 8vw, 5.5rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+  animation: fadeDown .8s ease .1s both;
+}
+
+h1 .highlight {
+  background: linear-gradient(135deg, var(--accent), var(--accent2), var(--accent3));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-sub {
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  color: var(--text-dim);
+  max-width: 500px;
+  margin-bottom: 2.5rem;
+  animation: fadeDown .8s ease .2s both;
+}
+
+.hero-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.05rem;
+  padding: 1rem 2rem;
+  border-radius: 100px;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform .2s, box-shadow .2s;
+  animation: fadeDown .8s ease .35s both;
+}
+.hero-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(255,87,34,.35); }
+.hero-cta:active { transform: scale(.97); }
+
+/* Scrolling gear icon */
+.gear-icon {
+  width: 160px; height: 160px;
+  position: absolute;
+  bottom: -30px; right: -30px;
+  opacity: .04;
+  animation: spin 30s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes fadeDown { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ── SECTIONS ── */
+.section {
+  padding: 4rem 1.5rem;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.section-label {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  font-size: .75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--accent);
+  margin-bottom: .75rem;
+}
+
+h2 {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: clamp(1.8rem, 5vw, 2.6rem);
+  line-height: 1.1;
+  margin-bottom: 1.25rem;
+}
+
+.prose {
+  color: var(--text-dim);
+  font-size: 1.05rem;
+  margin-bottom: 1.5rem;
+}
+
+.prose strong { color: var(--text); }
+
+/* ── INTERACTIVE CLUTCH DIAGRAM ── */
+.clutch-diagram {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin: 2rem 0;
+  border: 1px solid rgba(255,255,255,.06);
+}
+
+.clutch-visual {
+  position: relative;
+  height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.clutch-part {
+  position: absolute;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: .7rem;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  transition: all .6s cubic-bezier(.4,0,.2,1);
+  cursor: default;
+}
+
+.flywheel {
+  width: 140px; height: 140px;
+  background: radial-gradient(circle, #555, #333);
+  border: 4px solid #666;
+  left: calc(50% - 140px);
+  z-index: 1;
+  box-shadow: inset 0 0 20px rgba(0,0,0,.5);
+}
+
+.friction-plate {
+  width: 120px; height: 120px;
+  background: radial-gradient(circle, #8d6e3f, #6b5230);
+  border: 3px solid #a08050;
+  left: calc(50% - 50px);
+  z-index: 2;
+  box-shadow: inset 0 0 15px rgba(0,0,0,.4);
+}
+
+.pressure-plate {
+  width: 130px; height: 130px;
+  background: radial-gradient(circle, #4a4a4a, #2a2a2a);
+  border: 4px solid #5a5a5a;
+  left: calc(50% + 20px);
+  z-index: 3;
+  box-shadow: inset 0 0 20px rgba(0,0,0,.5);
+}
+
+/* Engaged state (default) */
+.clutch-visual.engaged .flywheel { left: calc(50% - 110px); }
+.clutch-visual.engaged .friction-plate { left: calc(50% - 48px); }
+.clutch-visual.engaged .pressure-plate { left: calc(50% + 10px); }
+
+/* Disengaged state */
+.clutch-visual.disengaged .flywheel { left: calc(50% - 140px); }
+.clutch-visual.disengaged .friction-plate { left: calc(50% - 30px); }
+.clutch-visual.disengaged .pressure-plate { left: calc(50% + 60px); }
+
+.clutch-status {
+  text-align: center;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: .6rem;
+  border-radius: 10px;
+  transition: all .4s;
+  margin-bottom: 1rem;
+}
+.clutch-status.on { background: rgba(0,230,118,.12); color: var(--success); }
+.clutch-status.off { background: rgba(255,87,34,.12); color: var(--accent); }
+
+.clutch-pedal-btn {
+  display: block;
+  width: 100%;
+  padding: 1rem;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  border: 2px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all .25s;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.clutch-pedal-btn:hover { background: rgba(255,87,34,.1); }
+.clutch-pedal-btn:active, .clutch-pedal-btn.pressed {
+  background: var(--accent);
+  color: #fff;
+  transform: scale(.97);
+}
+
+.clutch-labels {
+  display: flex;
+  justify-content: center;
+  gap: .6rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.clutch-label-chip {
+  font-size: .72rem;
+  font-weight: 600;
+  padding: .35rem .7rem;
+  border-radius: 100px;
+  border: 1px solid rgba(255,255,255,.1);
+  background: var(--surface2);
+}
+
+.flywheel-chip { border-color: #666; color: #aaa; }
+.friction-chip { border-color: #a08050; color: #c9a76c; }
+.pressure-chip { border-color: #5a5a5a; color: #999; }
+
+/* ── INFO CARDS ── */
+.info-cards {
+  display: grid;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.info-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  border: 1px solid rgba(255,255,255,.06);
+  transition: border-color .3s;
+}
+.info-card:hover { border-color: rgba(255,87,34,.2); }
+
+.info-card-icon {
+  font-size: 2rem;
+  margin-bottom: .75rem;
+}
+
+.info-card h3 {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 1.15rem;
+  margin-bottom: .5rem;
+}
+
+.info-card p {
+  color: var(--text-dim);
+  font-size: .95rem;
+}
+
+/* ── STEPS / PROCESS ── */
+.process-steps {
+  position: relative;
+  padding-left: 2.5rem;
+  margin: 2rem 0;
+}
+
+.process-steps::before {
+  content: '';
+  position: absolute;
+  left: 14px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--accent), var(--accent2), var(--accent3));
+  border-radius: 2px;
+}
+
+.step {
+  position: relative;
+  margin-bottom: 2rem;
+  opacity: 0;
+  transform: translateX(-10px);
+  animation: stepIn .5s ease forwards;
+}
+
+.step:nth-child(1) { animation-delay: .1s; }
+.step:nth-child(2) { animation-delay: .25s; }
+.step:nth-child(3) { animation-delay: .4s; }
+.step:nth-child(4) { animation-delay: .55s; }
+
+@keyframes stepIn { to { opacity: 1; transform: translateX(0); } }
+
+.step-dot {
+  position: absolute;
+  left: -2.5rem;
+  top: .15rem;
+  width: 30px; height: 30px;
+  background: var(--surface);
+  border: 3px solid var(--accent);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .75rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.step h4 {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 1.05rem;
+  margin-bottom: .35rem;
+}
+
+.step p {
+  color: var(--text-dim);
+  font-size: .95rem;
+}
+
+/* ── FLIP CARDS ── */
+.flip-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.flip-card {
+  perspective: 800px;
+  height: 180px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.flip-card-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transition: transform .5s cubic-bezier(.4,0,.2,1);
+  transform-style: preserve-3d;
+}
+
+.flip-card.flipped .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-front, .flip-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  text-align: center;
+}
+
+.flip-front {
+  background: var(--surface);
+  border: 1px solid rgba(255,87,34,.2);
+}
+.flip-front .flip-emoji { font-size: 2.2rem; margin-bottom: .5rem; }
+.flip-front .flip-title { font-weight: 700; font-size: .9rem; }
+.flip-front .flip-hint { font-size: .7rem; color: var(--text-dim); margin-top: .4rem; }
+
+.flip-back {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  transform: rotateY(180deg);
+  color: #fff;
+  font-size: .85rem;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+/* ── GEAR SELECTOR GAME ── */
+.gear-game {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin: 2rem 0;
+  border: 1px solid rgba(255,255,255,.06);
+}
+
+.gear-game h3 {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 1.2rem;
+  margin-bottom: .5rem;
+}
+
+.gear-scenario {
+  color: var(--text-dim);
+  font-size: .95rem;
+  margin-bottom: 1.25rem;
+  min-height: 50px;
+}
+
+.gear-pattern {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: .5rem;
+  max-width: 260px;
+  margin: 0 auto 1.25rem;
+}
+
+.gear-slot {
+  aspect-ratio: 1;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: all .2s;
+  border: 2px solid rgba(255,255,255,.08);
+  background: var(--surface2);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.gear-slot:hover { border-color: var(--accent); background: rgba(255,87,34,.08); }
+.gear-slot:active { transform: scale(.93); }
+.gear-slot.selected { border-color: var(--accent); background: var(--accent); color: #fff; }
+.gear-slot.correct { border-color: var(--success); background: rgba(0,230,118,.15); color: var(--success); }
+.gear-slot.wrong { border-color: var(--fail); background: rgba(255,23,68,.12); color: var(--fail); animation: shake .4s; }
+.gear-slot.empty { visibility: hidden; }
+
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+
+.gear-feedback {
+  text-align: center;
+  font-weight: 700;
+  font-size: .95rem;
+  min-height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .4rem;
+}
+
+.gear-next-btn {
+  display: block;
+  width: 100%;
+  margin-top: .75rem;
+  padding: .8rem;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 700;
+  font-size: .9rem;
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all .2s;
+}
+.gear-next-btn:hover { border-color: var(--accent); }
+
+/* ── QUIZ ── */
+.quiz-container {
+  margin: 2rem 0;
+}
+
+.quiz-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  border: 1px solid rgba(255,255,255,.06);
+}
+
+.quiz-num {
+  font-size: .7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--accent);
+  margin-bottom: .5rem;
+}
+
+.quiz-q {
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin-bottom: 1rem;
+}
+
+.quiz-options { display: grid; gap: .5rem; }
+
+.quiz-opt {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: .85rem 1rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .95rem;
+  background: var(--surface2);
+  color: var(--text);
+  border: 2px solid rgba(255,255,255,.06);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all .2s;
+  line-height: 1.4;
+}
+
+.quiz-opt:hover:not(.locked) { border-color: var(--accent); background: rgba(255,87,34,.06); }
+.quiz-opt:active:not(.locked) { transform: scale(.98); }
+.quiz-opt.correct { border-color: var(--success); background: rgba(0,230,118,.1); }
+.quiz-opt.wrong { border-color: var(--fail); background: rgba(255,23,68,.08); opacity: .6; }
+.quiz-opt.locked { cursor: default; }
+
+.quiz-explanation {
+  margin-top: .75rem;
+  padding: .85rem 1rem;
+  background: rgba(255,87,34,.06);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 10px 10px 0;
+  font-size: .9rem;
+  color: var(--text-dim);
+  display: none;
+}
+.quiz-explanation.show { display: block; animation: fadeDown .3s ease; }
+
+/* ── SCORE BAR ── */
+.score-bar {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(13,13,13,.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(255,255,255,.06);
+  padding: .75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 100;
+  transform: translateY(100%);
+  transition: transform .4s ease;
+}
+.score-bar.visible { transform: translateY(0); }
+
+.score-text {
+  font-weight: 700;
+  font-size: .9rem;
+}
+
+.score-fill-wrap {
+  flex: 1;
+  max-width: 200px;
+  height: 8px;
+  background: var(--surface2);
+  border-radius: 100px;
+  margin-left: 1rem;
+  overflow: hidden;
+}
+
+.score-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent3));
+  border-radius: 100px;
+  width: 0%;
+  transition: width .5s ease;
+}
+
+/* ── FOOTER ── */
+.lesson-footer {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  color: var(--text-dim);
+  font-size: .85rem;
+}
+
+.lesson-footer .footer-icon { font-size: 2rem; margin-bottom: .5rem; }
+
+/* ── RESPONSIVE ── */
+@media (min-width: 600px) {
+  .info-cards { grid-template-columns: 1fr 1fr; }
+  .flip-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* ── SCROLL REVEAL ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity .6s ease, transform .6s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ HERO ═══════════ -->
+<header class="hero">
+  <div class="hero-badge"><span>⚙️</span> Interactive Lesson</div>
+  <h1>CLUTCH &<br><span class="highlight">GEARBOX</span></h1>
+  <p class="hero-sub">Master how the clutch system connects your engine to the wheels — with hands-on activities and a quiz to test your knowledge.</p>
+  <a href="#start" class="hero-cta">Start Learning ↓</a>
+  <svg class="gear-icon" viewBox="0 0 100 100"><path d="M50 15a2 2 0 01-2 2h-4l-3-8-7 3 2 8h-1a2 2 0 01-1.7 1l-7-5-5 5 5 7a2 2 0 01-1 1.7h-1l-8-2-3 7 8 3v4a2 2 0 01-2 2l-8 3 3 7 8-2v1a2 2 0 011 1.7l-5 7 5 5 7-5a2 2 0 011.7 1v1l-2 8 7 3 3-8h4a2 2 0 012 2l3 8 7-3-2-8h1a2 2 0 011.7-1l7 5 5-5-5-7a2 2 0 011-1.7h1l8 2 3-7-8-3v-4a2 2 0 012-2l8-3-3-7-8 2v-1a2 2 0 01-1-1.7l5-7-5-5-7 5a2 2 0 01-1.7-1v-1l2-8-7-3z" fill="currentColor"/><circle cx="50" cy="50" r="14" fill="none" stroke="currentColor" stroke-width="4"/></svg>
+</header>
+
+<!-- ═══════════ SECTION 1: WHAT IS THE CLUTCH? ═══════════ -->
+<section id="start" class="section reveal">
+  <div class="section-label">📘 Section 1</div>
+  <h2>What Does the Clutch Actually Do?</h2>
+  <p class="prose">The clutch is the <strong>connection point</strong> between the engine and the gearbox. It allows the driver to <strong>smoothly connect and disconnect</strong> engine power from the drivetrain — essential for changing gears, pulling away from a stop, and preventing the engine from stalling.</p>
+  <p class="prose">Think of it like a handshake between two spinning discs. When the clutch is <strong>engaged</strong>, the engine and gearbox spin together. When <strong>disengaged</strong>, they spin independently.</p>
+
+  <div class="info-cards">
+    <div class="info-card">
+      <div class="info-card-icon">🔄</div>
+      <h3>Smooth Take-Up</h3>
+      <p>Allows gradual connection of a spinning engine to stationary wheels — no jerking or stalling.</p>
+    </div>
+    <div class="info-card">
+      <div class="info-card-icon">⚡</div>
+      <h3>Gear Changes</h3>
+      <p>Disconnects engine torque so gear cogs can be slid into mesh without grinding or damage.</p>
+    </div>
+    <div class="info-card">
+      <div class="info-card-icon">🛡️</div>
+      <h3>Overload Protection</h3>
+      <p>The clutch can slip under extreme load, protecting the gearbox and drivetrain from damage.</p>
+    </div>
+    <div class="info-card">
+      <div class="info-card-icon">🅿️</div>
+      <h3>Stationary Idle</h3>
+      <p>Allows the engine to keep running while the vehicle is stopped with a gear selected.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ SECTION 2: KEY COMPONENTS — FLIP CARDS ═══════════ -->
+<section class="section reveal">
+  <div class="section-label">🔧 Section 2</div>
+  <h2>Key Components</h2>
+  <p class="prose">Tap each card to reveal what the component does inside the clutch assembly.</p>
+
+  <div class="flip-grid">
+    <div class="flip-card" onclick="this.classList.toggle('flipped')">
+      <div class="flip-card-inner">
+        <div class="flip-front">
+          <div class="flip-emoji">⚙️</div>
+          <div class="flip-title">Flywheel</div>
+          <div class="flip-hint">Tap to reveal</div>
+        </div>
+        <div class="flip-back">Bolted to the crankshaft. Provides a smooth, flat friction surface and stores rotational energy.</div>
+      </div>
+    </div>
+    <div class="flip-card" onclick="this.classList.toggle('flipped')">
+      <div class="flip-card-inner">
+        <div class="flip-front">
+          <div class="flip-emoji">🟤</div>
+          <div class="flip-title">Friction Plate</div>
+          <div class="flip-hint">Tap to reveal</div>
+        </div>
+        <div class="flip-back">Also called the driven plate. Sandwiched between flywheel &amp; pressure plate. Its friction linings grip both surfaces.</div>
+      </div>
+    </div>
+    <div class="flip-card" onclick="this.classList.toggle('flipped')">
+      <div class="flip-card-inner">
+        <div class="flip-front">
+          <div class="flip-emoji">🔘</div>
+          <div class="flip-title">Pressure Plate</div>
+          <div class="flip-hint">Tap to reveal</div>
+        </div>
+        <div class="flip-back">Uses a diaphragm spring to clamp the friction plate against the flywheel with strong, even force.</div>
+      </div>
+    </div>
+    <div class="flip-card" onclick="this.classList.toggle('flipped')">
+      <div class="flip-card-inner">
+        <div class="flip-front">
+          <div class="flip-emoji">🎯</div>
+          <div class="flip-title">Release Bearing</div>
+          <div class="flip-hint">Tap to reveal</div>
+        </div>
+        <div class="flip-back">Pushes against the diaphragm spring fingers when the pedal is pressed, releasing clamping force.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ SECTION 3: INTERACTIVE CLUTCH ═══════════ -->
+<section class="section reveal">
+  <div class="section-label">🎮 Section 3</div>
+  <h2>Try It: Press the Clutch</h2>
+  <p class="prose">Press and hold the pedal button below to <strong>disengage</strong> the clutch. Release it to <strong>engage</strong>. Watch how the components move apart and together.</p>
+
+  <div class="clutch-diagram">
+    <div class="clutch-visual engaged" id="clutchVisual">
+      <div class="clutch-part flywheel">Flywheel</div>
+      <div class="clutch-part friction-plate" style="font-size:.6rem;">Friction<br>Plate</div>
+      <div class="clutch-part pressure-plate" style="font-size:.6rem;">Pressure<br>Plate</div>
+    </div>
+    <div class="clutch-status on" id="clutchStatus">✅ ENGAGED — Power is flowing to the gearbox</div>
+    <button class="clutch-pedal-btn" id="clutchPedal">🦶 PRESS &amp; HOLD — Clutch Pedal</button>
+    <div class="clutch-labels">
+      <span class="clutch-label-chip flywheel-chip">⚙️ Flywheel</span>
+      <span class="clutch-label-chip friction-chip">🟤 Friction Plate</span>
+      <span class="clutch-label-chip pressure-chip">🔘 Pressure Plate</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ SECTION 4: HOW IT WORKS STEP BY STEP ═══════════ -->
+<section class="section reveal">
+  <div class="section-label">📋 Section 4</div>
+  <h2>How Clutch Engagement Works</h2>
+  <p class="prose">Here's the sequence from <strong>pedal down</strong> (disengaged) to <strong>pedal up</strong> (fully engaged):</p>
+
+  <div class="process-steps">
+    <div class="step">
+      <div class="step-dot">1</div>
+      <h4>Pedal Pressed Fully Down</h4>
+      <p>The release bearing pushes against the diaphragm spring fingers. The pressure plate moves away from the friction plate. <strong>No drive is transmitted.</strong></p>
+    </div>
+    <div class="step">
+      <div class="step-dot">2</div>
+      <h4>Bite Point Reached</h4>
+      <p>As the pedal rises, the spring begins to push the pressure plate back. The friction plate starts to make contact — you feel the car begin to move. <strong>This is the bite point.</strong></p>
+    </div>
+    <div class="step">
+      <div class="step-dot">3</div>
+      <h4>Controlled Slip</h4>
+      <p>Between bite point and full engagement, the clutch slips intentionally. This allows <strong>smooth acceleration</strong> without jerking or stalling.</p>
+    </div>
+    <div class="step">
+      <div class="step-dot">4</div>
+      <h4>Fully Engaged</h4>
+      <p>Pedal fully released. Full spring pressure clamps the friction plate tight. <strong>Engine and gearbox rotate as one unit</strong> — no slip, maximum efficiency.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ SECTION 5: GEAR SELECTOR GAME ═══════════ -->
+<section class="section reveal">
+  <div class="section-label">🎮 Section 5</div>
+  <h2>Gear Selector Challenge</h2>
+  <p class="prose">Read the driving scenario and <strong>tap the correct gear</strong> on the pattern below. Remember: always use the clutch when changing gear!</p>
+
+  <div class="gear-game" id="gearGame">
+    <h3 id="gearScenarioTitle">Scenario <span id="gearRound">1</span> of 5</h3>
+    <p class="gear-scenario" id="gearScenario"></p>
+    <div class="gear-pattern" id="gearPattern">
+      <div class="gear-slot" data-gear="1" onclick="selectGear(1)">1</div>
+      <div class="gear-slot" data-gear="2" onclick="selectGear(2)">2</div>
+      <div class="gear-slot empty"></div>
+      <div class="gear-slot" data-gear="3" onclick="selectGear(3)">3</div>
+      <div class="gear-slot" data-gear="4" onclick="selectGear(4)">4</div>
+      <div class="gear-slot empty"></div>
+      <div class="gear-slot" data-gear="5" onclick="selectGear(5)">5</div>
+      <div class="gear-slot" data-gear="R" onclick="selectGear('R')">R</div>
+      <div class="gear-slot empty"></div>
+    </div>
+    <div class="gear-feedback" id="gearFeedback">&nbsp;</div>
+    <button class="gear-next-btn" id="gearNextBtn" onclick="nextGearScenario()" style="display:none;">Next Scenario →</button>
+  </div>
+</section>
+
+<!-- ═══════════ SECTION 6: QUIZ ═══════════ -->
+<section class="section reveal">
+  <div class="section-label">✏️ Section 6</div>
+  <h2>Knowledge Check</h2>
+  <p class="prose">Put your learning to the test. Select the <strong>best answer</strong> for each question.</p>
+
+  <div class="quiz-container" id="quizContainer"></div>
+</section>
+
+<!-- ═══════════ SCORE BAR ═══════════ -->
+<div class="score-bar" id="scoreBar">
+  <div class="score-text">Score: <span id="scoreNum">0</span> / <span id="scoreTotal">0</span></div>
+  <div class="score-fill-wrap"><div class="score-fill" id="scoreFill"></div></div>
+</div>
+
+<!-- ═══════════ FOOTER ═══════════ -->
+<footer class="lesson-footer">
+  <div class="footer-icon">🏁</div>
+  <p>Clutch &amp; Gearbox Interactive Lesson<br>Created for Motor Vehicle Maintenance Students</p>
+</footer>
+
+<script>
+// ═══════════ CLUTCH INTERACTIVE ═══════════
+const pedal = document.getElementById('clutchPedal');
+const visual = document.getElementById('clutchVisual');
+const status = document.getElementById('clutchStatus');
+
+function disengage() {
+  visual.classList.remove('engaged');
+  visual.classList.add('disengaged');
+  status.className = 'clutch-status off';
+  status.textContent = '🔴 DISENGAGED — No power to the gearbox';
+  pedal.classList.add('pressed');
+}
+
+function engage() {
+  visual.classList.remove('disengaged');
+  visual.classList.add('engaged');
+  status.className = 'clutch-status on';
+  status.textContent = '✅ ENGAGED — Power is flowing to the gearbox';
+  pedal.classList.remove('pressed');
+}
+
+pedal.addEventListener('mousedown', disengage);
+pedal.addEventListener('mouseup', engage);
+pedal.addEventListener('mouseleave', engage);
+pedal.addEventListener('touchstart', e => { e.preventDefault(); disengage(); });
+pedal.addEventListener('touchend', e => { e.preventDefault(); engage(); });
+
+// ═══════════ GEAR SELECTOR GAME ═══════════
+const gearScenarios = [
+  { text: "You're pulling away from a junction on a flat road. Which gear should you select?", answer: 1, explain: "1st gear provides maximum torque for moving off." },
+  { text: "You're reversing into a parking bay. Which gear do you need?", answer: 'R', explain: "Reverse gear is needed for backward movement." },
+  { text: "You're driving at 30 mph in a 30 zone on a level road. Which gear is most appropriate?", answer: 3, explain: "3rd gear is typically appropriate for 30 mph driving." },
+  { text: "You're cruising at 50 mph on a dual carriageway. Which gear gives the best fuel economy?", answer: 5, explain: "5th gear at higher speeds reduces engine RPM and saves fuel." },
+  { text: "You're approaching a roundabout and have slowed to about 15 mph. Which gear should you be in?", answer: 2, explain: "2nd gear gives good control and flexibility at low speeds around roundabouts." }
+];
+
+let gearRoundIndex = 0;
+let gearLocked = false;
+
+function loadGearScenario() {
+  const s = gearScenarios[gearRoundIndex];
+  document.getElementById('gearRound').textContent = gearRoundIndex + 1;
+  document.getElementById('gearScenario').textContent = s.text;
+  document.getElementById('gearFeedback').innerHTML = '&nbsp;';
+  document.getElementById('gearNextBtn').style.display = 'none';
+  gearLocked = false;
+  document.querySelectorAll('.gear-slot:not(.empty)').forEach(el => {
+    el.className = 'gear-slot';
+  });
+}
+
+function selectGear(g) {
+  if (gearLocked) return;
+  gearLocked = true;
+  const s = gearScenarios[gearRoundIndex];
+  const correct = String(g) === String(s.answer);
+  const fb = document.getElementById('gearFeedback');
+
+  document.querySelectorAll('.gear-slot:not(.empty)').forEach(el => {
+    if (String(el.dataset.gear) === String(g)) {
+      el.classList.add(correct ? 'correct' : 'wrong');
+    }
+    if (String(el.dataset.gear) === String(s.answer) && !correct) {
+      setTimeout(() => el.classList.add('correct'), 500);
+    }
+  });
+
+  if (correct) {
+    fb.innerHTML = '✅ Correct! ' + s.explain;
+    fb.style.color = 'var(--success)';
+    addScore();
+  } else {
+    fb.innerHTML = '❌ Not quite. ' + s.explain;
+    fb.style.color = 'var(--fail)';
+  }
+
+  if (gearRoundIndex < gearScenarios.length - 1) {
+    document.getElementById('gearNextBtn').style.display = 'block';
+  }
+}
+
+function nextGearScenario() {
+  gearRoundIndex++;
+  if (gearRoundIndex < gearScenarios.length) loadGearScenario();
+}
+
+loadGearScenario();
+
+// ═══════════ QUIZ ═══════════
+const quizData = [
+  {
+    q: "What is the primary purpose of the clutch in a manual transmission vehicle?",
+    opts: [
+      "To increase engine power output",
+      "To connect and disconnect the engine from the gearbox",
+      "To apply the vehicle's brakes",
+      "To change the direction of the crankshaft"
+    ],
+    correct: 1,
+    explain: "The clutch allows the driver to temporarily disconnect the engine from the gearbox for gear changes and pulling away."
+  },
+  {
+    q: "Which component is bolted directly to the engine's crankshaft?",
+    opts: [
+      "Pressure plate",
+      "Release bearing",
+      "Flywheel",
+      "Friction plate"
+    ],
+    correct: 2,
+    explain: "The flywheel bolts to the crankshaft and provides a smooth friction surface for the driven plate to grip against."
+  },
+  {
+    q: "What happens to the friction plate when the clutch pedal is fully depressed?",
+    opts: [
+      "It is clamped tighter against the flywheel",
+      "It spins faster than the flywheel",
+      "It is released and can spin freely from the flywheel",
+      "It locks the gearbox output shaft"
+    ],
+    correct: 2,
+    explain: "When the pedal is pressed, the release bearing pushes the diaphragm spring, releasing clamping force so the friction plate spins freely."
+  },
+  {
+    q: "What do we call the point where the friction plate first makes contact and the vehicle begins to move?",
+    opts: [
+      "The friction zone",
+      "The contact patch",
+      "The bite point",
+      "The engagement threshold"
+    ],
+    correct: 2,
+    explain: "The bite point is the position where the clutch plates first make contact and begin to transmit drive."
+  },
+  {
+    q: "What type of spring is most commonly used in modern clutch pressure plates?",
+    opts: [
+      "Coil spring",
+      "Leaf spring",
+      "Diaphragm spring",
+      "Torsion spring"
+    ],
+    correct: 2,
+    explain: "Modern clutches predominantly use a diaphragm (Belleville) spring for consistent, even clamping pressure across the full plate surface."
+  },
+  {
+    q: "Why is clutch slip important during take-up?",
+    opts: [
+      "It cools the friction plate down",
+      "It prevents the engine from over-revving",
+      "It allows a smooth, gradual transfer of drive to avoid stalling",
+      "It protects the release bearing from damage"
+    ],
+    correct: 2,
+    explain: "Controlled slip lets the driver gradually transfer engine torque to the stationary drivetrain for smooth, jerk-free take-up."
+  }
+];
+
+let score = 0;
+let totalQ = gearScenarios.length + quizData.length;
+
+function buildQuiz() {
+  const container = document.getElementById('quizContainer');
+  quizData.forEach((item, qi) => {
+    const card = document.createElement('div');
+    card.className = 'quiz-card';
+    card.innerHTML = `
+      <div class="quiz-num">Question ${qi + 1} of ${quizData.length}</div>
+      <div class="quiz-q">${item.q}</div>
+      <div class="quiz-options" id="qOpts${qi}">
+        ${item.opts.map((o, oi) => `<button class="quiz-opt" onclick="answerQuiz(${qi},${oi})">${o}</button>`).join('')}
+      </div>
+      <div class="quiz-explanation" id="qExp${qi}">${item.explain}</div>
+    `;
+    container.appendChild(card);
+  });
+  document.getElementById('scoreTotal').textContent = totalQ;
+}
+
+function answerQuiz(qi, oi) {
+  const opts = document.querySelectorAll(`#qOpts${qi} .quiz-opt`);
+  if (opts[0].classList.contains('locked')) return;
+
+  opts.forEach((btn, i) => {
+    btn.classList.add('locked');
+    if (i === quizData[qi].correct) btn.classList.add('correct');
+    else if (i === oi) btn.classList.add('wrong');
+  });
+
+  document.getElementById(`qExp${qi}`).classList.add('show');
+  if (oi === quizData[qi].correct) addScore();
+}
+
+function addScore() {
+  score++;
+  document.getElementById('scoreNum').textContent = score;
+  const pct = (score / totalQ) * 100;
+  document.getElementById('scoreFill').style.width = pct + '%';
+}
+
+buildQuiz();
+
+// ═══════════ SCORE BAR VISIBILITY ═══════════
+const scoreBar = document.getElementById('scoreBar');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      scoreBar.classList.add('visible');
+      observer.disconnect();
+    }
+  });
+}, { threshold: 0.2 });
+observer.observe(document.getElementById('gearGame'));
+
+// ═══════════ SCROLL REVEAL ═══════════
+const revealObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+</script>
+</body>
+</html>
