@@ -950,42 +950,42 @@ const quizData = [
     q: "What is the primary purpose of the clutch in a manual transmission vehicle?",
     opts: [
       "To increase engine power output",
-      "To connect and disconnect the engine from the gearbox",
       "To apply the vehicle's brakes",
-      "To change the direction of the crankshaft"
+      "To change the direction of the crankshaft",
+      "To connect and disconnect the engine from the gearbox"
     ],
-    correct: 1,
+    correct: 3,
     explain: "The clutch allows the driver to temporarily disconnect the engine from the gearbox for gear changes and pulling away."
   },
   {
     q: "Which component is bolted directly to the engine's crankshaft?",
     opts: [
-      "Pressure plate",
-      "Release bearing",
       "Flywheel",
-      "Friction plate"
+      "Pressure plate",
+      "Friction plate",
+      "Release bearing"
     ],
-    correct: 2,
+    correct: 0,
     explain: "The flywheel bolts to the crankshaft and provides a smooth friction surface for the driven plate to grip against."
   },
   {
     q: "What happens to the friction plate when the clutch pedal is fully depressed?",
     opts: [
       "It is clamped tighter against the flywheel",
-      "It spins faster than the flywheel",
       "It is released and can spin freely from the flywheel",
-      "It locks the gearbox output shaft"
+      "It locks the gearbox output shaft",
+      "It spins faster than the flywheel"
     ],
-    correct: 2,
+    correct: 1,
     explain: "When the pedal is pressed, the release bearing pushes the diaphragm spring, releasing clamping force so the friction plate spins freely."
   },
   {
     q: "What do we call the point where the friction plate first makes contact and the vehicle begins to move?",
     opts: [
       "The friction zone",
-      "The contact patch",
+      "The engagement threshold",
       "The bite point",
-      "The engagement threshold"
+      "The contact patch"
     ],
     correct: 2,
     explain: "The bite point is the position where the clutch plates first make contact and begin to transmit drive."
@@ -994,22 +994,22 @@ const quizData = [
     q: "What type of spring is most commonly used in modern clutch pressure plates?",
     opts: [
       "Coil spring",
+      "Torsion spring",
       "Leaf spring",
-      "Diaphragm spring",
-      "Torsion spring"
+      "Diaphragm spring"
     ],
-    correct: 2,
+    correct: 3,
     explain: "Modern clutches predominantly use a diaphragm (Belleville) spring for consistent, even clamping pressure across the full plate surface."
   },
   {
     q: "Why is clutch slip important during take-up?",
     opts: [
-      "It cools the friction plate down",
-      "It prevents the engine from over-revving",
       "It allows a smooth, gradual transfer of drive to avoid stalling",
-      "It protects the release bearing from damage"
+      "It cools the friction plate down",
+      "It protects the release bearing from damage",
+      "It prevents the engine from over-revving"
     ],
-    correct: 2,
+    correct: 0,
     explain: "Controlled slip lets the driver gradually transfer engine torque to the stationary drivetrain for smooth, jerk-free take-up."
   }
 ];
